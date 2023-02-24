@@ -17,7 +17,7 @@ func TestAuthFlow(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	err = ctx.DoAuth()
+	err = ctx.DoSSOAuth()
 	if err != nil {
 		t.Fatal(err)
 	}

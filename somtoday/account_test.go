@@ -18,7 +18,7 @@ func TestGetAccount(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	err = ctx.LoadOrDoAuth()
+	err = ctx.LoadOrDoSSOAuth()
 	if err != nil {
 		t.Fatal(err)
 	}

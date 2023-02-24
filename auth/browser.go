@@ -83,5 +83,5 @@ func (c *ControlledBrowser) GetToken(ctx *Context) (Token, error) {
 		return Token{}, err
 	}
 
-	return GetToken(code, verifier, ctx)
+	return GetTokenOAuth(code, verifier, ctx)
 }

@@ -11,6 +11,7 @@ import (
 
 const oAuthUrl = "https://somtoday.nl/oauth2/authorize?redirect_uri=%s&client_id=%s&response_type=code&prompt=login&scope=openid&code_challenge=%s&code_challenge_method=S256&tenant_uuid=%s&oidc_iss=%s"
 const authorizationUrl = "https://inloggen.somtoday.nl/oauth2/token?grant_type=authorization_code&redirect_uri=%s&code_verifier=%s&code=%s&scope=openid&client_id=%s"
+const passwordUrl = "https://inloggen.somtoday.nl/oauth2/token?grant_type=password&username=%s&password=%s&scope=openid&client_id=%s"
 const refreshUrl = "https://inloggen.somtoday.nl/oauth2/token?grant_type=refresh_token&refresh_token=%s&client_id=%s"
 
 func RefreshToken(ctx *Context) (Token, error) {
@@ -31,7 +32,26 @@ func RefreshToken(ctx *Context) (Token, error) {
 	return tokenFromRequest(req)
 }
 
-func GetToken(code string, verifier string, ctx *Context) (Token, error) {
+func GetTokenPassword(username string, password string, ctx *Context) (Token, error) {
+	reqUrl, _ := url.Parse(fmt.Sprintf(
+		passwordUrl,
+		url.QueryEscape(ctx.Organisation.UUID+"\\"+username),
+		url.QueryEscape(password),
+		ctx.clientId,
+	),
+	)
+	req := &http.Request{
+		Method: "POST",
+		URL:    reqUrl,
+		Header: map[string][]string{
+			"User-Agent":   {ctx.UserAgent},
+			"Content-Type": {"application/x-www-form-urlencoded"},
+		},
+	}
+	return tokenFromRequest(req)
+}
+
+func GetTokenOAuth(code string, verifier string, ctx *Context) (Token, error) {
 	reqUrl, _ := url.Parse(fmt.Sprintf(
 		authorizationUrl,
 		url.QueryEscape(ctx.redirectUrl),

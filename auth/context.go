@@ -104,7 +104,7 @@ func (ctx *Context) TokenValid() error {
 	return nil
 }
 
-func (ctx *Context) LoadOrDoAuth() error {
+func (ctx *Context) LoadOrLogin(username, password string) error {
 	if ctx.cacheDir != "" {
 		if _, err := os.Stat(filepath.Join(ctx.cacheDir, "token.json")); !os.IsNotExist(err) {
 			var token Token
@@ -118,7 +118,29 @@ func (ctx *Context) LoadOrDoAuth() error {
 	return ctx.doAuthFlow()
 }
 
-func (ctx *Context) DoAuth() error {
+func (ctx *Context) LoadOrDoSSOAuth() error {
+	if ctx.cacheDir != "" {
+		if _, err := os.Stat(filepath.Join(ctx.cacheDir, "token.json")); !os.IsNotExist(err) {
+			var token Token
+			token, err = ctx.retrieveTokenFromCache()
+			if err != nil {
+				return err
+			}
+			return ctx.SetToken(token)
+		}
+	}
+	return ctx.doAuthFlow()
+}
+
+func (ctx *Context) DoLogin(username, password string) error {
+	token, err := GetTokenPassword(username, password, ctx)
+	if err != nil {
+		return err
+	}
+	return ctx.SetToken(token)
+}
+
+func (ctx *Context) DoSSOAuth() error {
 	return ctx.doAuthFlow()
 }
 
